@@ -72,7 +72,7 @@ Project was built using:
 * [Python 3](https://www.python.org/)
   * [Requests](https://pypi.org/project/requests/)
   * [BeautifulSoup](https://pypi.org/project/beautifulsoup4/)
-  * [MariaDB](https://pypi.org/project/mariadb/)
+  * [MySQLConnector](https://pypi.org/project/mysql-connector-python/)
 * [Docker](https://www.docker.com/)
 * [PushBullet](https://www.pushbullet.com/)
 
@@ -98,7 +98,7 @@ If running locally as a python script, ensure environment variables are set as f
 ```sh
 # Database Info
 DB_USER=mariadb_username
-DB_PASSWORD=mariadb_username
+DB_PASSWORD=mariadb_password
 DB_HOST=mariadb_hostname/IP
 DB_PORT=mariadb_portnumber
 DB_DATABASE=mariadb_database_name
@@ -122,13 +122,31 @@ PB_ADDRESS=recipient_phone_number
 
 ### Docker Installation & Usage
 
-1. Build Docker Image:
+1. Build Docker Image for Multi-Platform:
     ```sh
-   docker build -t likickscraper:latest
+   docker buildx build -t likickscraper:latest --platform linux/amd64,linux/arm64 .
    ```
 2. Run the image (setting environment variables)
     ```sh
-    docker run --rm --env DB_USER=mariadb_username --env DB_PASSWORD=mariadb_username --env DB_HOST=mariadb_hostname/IP --env DB_PORT=mariadb_portnumber --env DB_DATABASE=mariadb_database_name --env PB_ACCESS_TOKEN=pushbullet_access_token --env PB_PHONE_DEVICE_ID=pushbullet_device_id --env PB_ADDRESS=recipient_phone_number likickscraper:latest
+    docker run --rm --env DB_USER=mariadb_username --env DB_PASSWORD=mariadb_password --env DB_HOST=mariadb_hostname/IP --env DB_PORT=mariadb_portnumber --env DB_DATABASE=mariadb_database_name --env PB_ACCESS_TOKEN=pushbullet_access_token --env PB_PHONE_DEVICE_ID=pushbullet_device_id --env PB_ADDRESS=recipient_phone_number likickscraper:latest
+    ```
+
+### No Installation Method: Cron Job Pull Image & Run Container on Raspberry Pi
+
+1. Create new shell script *(e.g. li-kick-scraper.sh)* with the following contents:
+    ```sh
+    # Pull latest image from Github Container Registry
+    docker pull ghcr.io/johnentrieri/likickscraper:latest
+
+    # Run Container for ARM64 Platform
+    docker run --rm --platform linux/arm64 --env DB_USER=mariadb_username --env DB_PASSWORD=mariadb_password --env DB_HOST=mariadb_hostname/IP --env DB_PORT=mariadb_portnumber --env DB_DATABASE=mariadb_database_name --env PB_ACCESS_TOKEN=pushbullet_access_token --env PB_PHONE_DEVICE_ID=pushbullet_device_id --env PB_ADDRESS=recipient_phone_number likickscraper:latest
+   ```
+2. Establish cron job (below example runs every 10 minutes):
+    ```sh
+    sudo crontab -e
+    ```
+    ```sh
+    */10 * * * * /path/to/li-kick-scraper.sh
     ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>

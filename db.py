@@ -1,6 +1,6 @@
 
 from dotenv import load_dotenv
-import mariadb
+import mysql.connector
 import os
 import sys
 
@@ -27,12 +27,13 @@ def init():
 def connect():
     try:
         # Connect to MariaDB
-        db_connection = mariadb.connect(
+        db_connection = mysql.connector.connect(
             user = os.environ.get('DB_USER'),
             password = os.environ.get('DB_PASSWORD'),
             host = os.environ.get('DB_HOST'),
-            port= int(os.environ.get('DB_PORT')),
-            database = os.environ.get('DB_DATABASE')
+            port = int(os.environ.get('DB_PORT')),
+            database = os.environ.get('DB_DATABASE'),
+            collation = 'utf8mb4_unicode_520_ci'
         )
         print ("Successfully Connected to MariaDB")
         return db_connection
